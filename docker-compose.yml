@@ -1,18 +1,30 @@
 version: '3'
 services:
   frontend:
-    image: frontend:latest
+    image: sageiyke/vueapp:v1
+    build:
+      context: ./
+      dockerfile: web.Dockerfile
+    container_name: frontend
+    # restart: always
     ports:
-      - "8080:8080"
+      - "80:80"
     env_file:
       - .env
+    # command: npm run serve
 
   backend:
-    image: backend:latest
+    image: sageiyke/flaskapp:v1
+    build:
+      context: ./
+      dockerfile: api.Dockerfile
     ports:
-      - "5080:5080"
+      - "5000:5000"
+    container_name: backend
+    # restart: always
     environment:
       - FLASK_APP=main.py
       - FLASK_ENV=development
     env_file:
       - .env
+    # command: flask run --host=0.0.0.0

@@ -1,0 +1,89 @@
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.0
+  python: circleci/python@2.1.1
+  docker: circleci/docker@2.4.0
+
+commands:
+  stop-container:
+    description: Stops Container and removes Image
+    steps:
+      - run:
+          name: Clean Environment
+          when: on_fail
+          command: |
+            docker stop $(ps -a -q)
+            docker rm $(ps -a -q)
+            docker rmi $(docker images -q)
+
+
+jobs:
+  frontend_build_and_test:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm run test
+          name: Run tests
+      - store_test_results:
+          path: /test-results/frontend
+      - run:
+          command: npm  run build
+          name: Build app
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - .
+  backend_build_and_test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          command: python -m pytest
+          name: Run tests
+      - store_test_results:
+          path: /test-results/backend
+      - run:
+          command: npm run build
+          name: Build app
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - .
+  lint-dockerfile:
+    executor: docker/machine
+    steps:
+      - checkout
+      - docker/dockerlint:
+          dockerfile: './web.Dockerfile:./api.Dockerfile'
+          treat-warnings-as-errors: true
+
+  docker-compose-up:
+    executor: docker/machine
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 22.0.0
+      - run:
+          name: Start Docker Compose
+          command: |
+            docker compose up --build -d
+      - stop-container
+
+workflows:
+  deploy-infra:
+    jobs:
+    - frontend_build_and_test
+    - backend_build_and_test
+    - lint-dockerfile
+    - docker-compose-up:
+        requires:
+        - lint-dockerfile
+        - frontend_build_and_test
+        - backend_build_and_test
