@@ -61,7 +61,7 @@ jobs:
     steps:
       - checkout
       - docker/dockerlint:
-          dockerfile: ../web.Dockerfile
+          dockerfile: web.Dockerfile
           # dockerfile: './web.Dockerfile, ./api.Dockerfile'
           treat-warnings-as-errors: true
 
