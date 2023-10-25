@@ -1,11 +1,11 @@
 import unittest
+from flask import Flask, testing
 from main import app
 
 class TestYourFlaskApp(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        self.app.testing = True
 
     def test_root_endpoint(self):
         response = self.app.get('/')
