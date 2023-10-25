@@ -45,7 +45,7 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run:
-          command: pip install pytest && pytest
+          command: pip install pytest && python -m pytest test.py
           name: Run tests
       - store_test_results:
           path: ./
