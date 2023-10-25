@@ -30,7 +30,7 @@ jobs:
   #         command: npm run lint
   #         name: Run tests
   #     - store_test_results:
-  #         path: /test-results/frontend
+  #         path: ./
   #     - run:
   #         command: npm  run build
   #         name: Build app
@@ -45,10 +45,10 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
       - run:
-          command: pip install pytest && python -m pytest
+          command: pip install pytest && pytest
           name: Run tests
       - store_test_results:
-          path: /test-results/backend
+          path: ./
       - run:
           command: npm run build
           name: Build app
