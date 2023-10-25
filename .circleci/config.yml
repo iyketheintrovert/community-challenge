@@ -69,12 +69,20 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: 22.0.0
+          docker_layer_caching: false
+      - run:
+          name: Login for Docker Hub
+          command: | 
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
       - run:
           name: Start Docker Compose
           command: |
             docker compose up --build -d
       - stop-container
+      - run:
+          name: Push Images
+          command: |
+            docker compose push
 
 workflows:
   deploy-infra:
