@@ -2,8 +2,8 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5.1.0
-  # python: circleci/python@2.1.1
+  # node: circleci/node@5.1.0
+  python: circleci/python@2.1.1
   # docker: circleci/docker@2.4.0
 
 # commands:
@@ -20,42 +20,42 @@ orbs:
 
 
 jobs:
-  frontend_build_and_test:
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run lint
-          name: Run tests
-      - store_test_results:
-          path: /test-results/frontend
-      - run:
-          command: npm  run build
-          name: Build app
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - .
-  # backend_build_and_test:
-  #   executor: python/default
+  # frontend_build_and_test:
+  #   executor: node/default
   #   steps:
   #     - checkout
-  #     - python/install-packages:
-  #         pkg-manager: pip
+  #     - node/install-packages:
+  #         pkg-manager: npm
   #     - run:
-  #         command: pip install pytest && python -m pytest
+  #         command: npm run lint
   #         name: Run tests
   #     - store_test_results:
-  #         path: /test-results/backend
+  #         path: /test-results/frontend
   #     - run:
-  #         command: npm run build
+  #         command: npm  run build
   #         name: Build app
   #     - persist_to_workspace:
   #         root: ./
   #         paths:
   #           - .
+  backend_build_and_test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          command: pip install pytest && python -m pytest
+          name: Run tests
+      - store_test_results:
+          path: /test-results/backend
+      - run:
+          command: npm run build
+          name: Build app
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - .
   # lint-dockerfile:
   #   executor: docker/machine
   #   steps:
@@ -87,8 +87,8 @@ jobs:
 workflows:
   deploy-infra:
     jobs:
-    - frontend_build_and_test
-    # - backend_build_and_test
+    # - frontend_build_and_test
+    - backend_build_and_test
     # - lint-dockerfile
     # - docker-compose-up:
     #     requires:
