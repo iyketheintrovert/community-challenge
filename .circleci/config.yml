@@ -67,8 +67,6 @@ jobs:
     executor: docker/machine
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: false
       - run:
           name: Login for Docker Hub
           command: | 
