@@ -6,17 +6,17 @@ orbs:
   python: circleci/python@2.1.1
   docker: circleci/docker@2.4.0
 
-# commands:
-#   stop-container:
-#     description: Stops Container and removes Image
-#     steps:
-#       - run:
-#           name: Clean Environment
-#           when: on_fail
-#           command: |
-#             docker stop $(ps -a -q)
-#             docker rm $(ps -a -q)
-#             docker rmi $(docker images -q)
+commands:
+  stop-container:
+    description: Stops Container and removes Image
+    steps:
+      - run:
+          name: Clean Environment
+          when: on_fail
+          command: |
+            docker stop $(ps -a -q)
+            docker rm $(ps -a -q)
+            docker rmi $(docker images -q)
 
 
 jobs:
@@ -63,25 +63,25 @@ jobs:
           treat-warnings-as-errors: true
 
 
-  # docker-compose-up:
-  #   executor: docker/machine
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker:
-  #         docker_layer_caching: false
-  #     - run:
-  #         name: Login for Docker Hub
-  #         command: | 
-  #           echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-  #     - run:
-  #         name: Start Docker Compose
-  #         command: |
-  #           docker compose up --build -d
-  #     - stop-container
-  #     - run:
-  #         name: Push Images
-  #         command: |
-  #           docker compose push
+  docker-compose-up:
+    executor: docker/machine
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Login for Docker Hub
+          command: | 
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run:
+          name: Start Docker Compose
+          command: |
+            docker compose up --build -d
+      - stop-container
+      - run:
+          name: Push Images
+          command: |
+            docker compose push
 
 workflows:
   deploy-infra:
@@ -90,9 +90,9 @@ workflows:
     - backend_test
     - lint-frontend-dockerfile
     - lint-backend-dockerfile
-    # - docker-compose-up:
-    #     requires:
-    #     - lint-frontend-dockerfile
-    #     - lint-backend-dockerfile
-    #     - frontend_build_and_test
-    #     - backend_build_and_test
+    - docker-compose-up:
+        requires:
+        - lint-frontend-dockerfile
+        - lint-backend-dockerfile
+        - frontend_test
+        - backend_test
