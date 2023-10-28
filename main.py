@@ -3,6 +3,7 @@ Hostober Flask App
 """
 
 import os
+from flask import Flask, jsonify # Added this
 from flask_cors import CORS
 import requests
 from dotenv import load_dotenv
@@ -32,10 +33,13 @@ def proxy():
         response = requests.request(
             method='GET',
             url=API_URL,
-            headers=headers
+            headers=headers,
+            timeout=10 # Added this
         )
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
+    # except Exception as e:
+    #     return jsonify({'error': str(e)}), 500
 
     return response.json()
 
