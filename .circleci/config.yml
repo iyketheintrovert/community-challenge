@@ -3,7 +3,7 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.1.0
-  # python: circleci/python@2.1.1
+  python: circleci/python@2.1.1
   docker: circleci/docker@2.4.0
 
 # commands:
@@ -29,27 +29,23 @@ jobs:
       - run:
           command: npm run lint
           name: Run tests
-      - store_test_results:
-          path: ./
       - persist_to_workspace:
           root: ./
           paths:
             - .
-  # backend_test:
-  #   executor: python/default
-  #   steps:
-  #     - checkout
-  #     - python/install-packages:
-  #         pkg-manager: pip
-  #     - run:
-  #         command: pip install pylint && pylint main.py
-  #         name: Run tests
-  #     - store_test_results:
-  #         path: ./
-  #     - persist_to_workspace:
-  #         root: ./
-  #         paths:
-  #           - .
+  backend_test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          command: pip install pylint && pylint main.py
+          name: Run tests
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - .
   lint-frontend-dockerfile:
     executor: docker/machine
     steps:
@@ -91,7 +87,7 @@ workflows:
   deploy-infra:
     jobs:
     - frontend_test
-    # - backend_test
+    - backend_test
     - lint-frontend-dockerfile
     - lint-backend-dockerfile
     # - docker-compose-up:
