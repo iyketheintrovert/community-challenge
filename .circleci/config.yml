@@ -116,14 +116,14 @@ jobs:
           command: |
                   echo
                   eksctl create cluster \
-                  --name devops-project \
+                  --name hostober-project \
                   --region us-east-1 \
                   --with-oidc \
                   --ssh-access \
                   --ssh-public-key sage-key
                   kubectl get nodes -o wide
-                  kubectl create namespace dev-namespace
-                  aws eks update-kubeconfig --name devops-project --region us-east-1
+                  kubectl create namespace prod-namespace
+                  aws eks update-kubeconfig --name hostober-project --region us-east-1
       # - run:
       #     name: Install Kubectl and Eksctl
       #     command: |
@@ -138,7 +138,7 @@ jobs:
       - run:
           name: Deploying application
           command: |
-              kubectl apply -f *.yml
+              kubectl apply -f '*.yml'
       - destroy-cluster
       # - run:
       #     name: Delete Cluster
