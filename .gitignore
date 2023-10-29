@@ -3,3 +3,7 @@ package-**
 node_modules
 .sage
 __pycache__
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
