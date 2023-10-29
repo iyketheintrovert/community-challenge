@@ -138,7 +138,10 @@ jobs:
       - run:
           name: Deploying application
           command: |
-              kubectl apply -k deployment/
+              kubectl apply -f deployment/backend-service.yml
+              kubectl apply -f deployment/backend.yml
+              kubectl apply -f deployment/frontend-service.yml
+              kubectl apply -f deployment/frontend.yml
       - destroy-cluster
       # - run:
       #     name: Delete Cluster
