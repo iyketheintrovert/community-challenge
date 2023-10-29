@@ -14,7 +14,7 @@ commands:
             name: Destroy environment
             when: on_fail
             command: |
-              eksctl delete cluster --name devops-project
+              eksctl delete cluster --name hostober-project
 
   install-kubectl-and-eksctl:
     description: install kubectl and eksctl packages
@@ -138,7 +138,7 @@ jobs:
       - run:
           name: Deploying application
           command: |
-              kubectl apply -f '*.yml'
+              kubectl apply -k deployment/
       - destroy-cluster
       # - run:
       #     name: Delete Cluster
