@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: prod-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hostober
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hostober
+        tier: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: sageiyke/vueapp:v1

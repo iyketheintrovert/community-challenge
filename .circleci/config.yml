@@ -18,7 +18,6 @@ commands:
             docker rm $(ps -a -q)
             docker rmi $(docker images -q)
 
-
 jobs:
   frontend_test:
     executor: node/default
@@ -63,7 +62,7 @@ jobs:
           treat-warnings-as-errors: true
 
 
-  docker-compose-up:
+  docker-compose:
     executor: docker/machine
     steps:
       - checkout
@@ -80,6 +79,33 @@ jobs:
           name: Push Images
           command: |
             docker compose push
+  
+  create-cluster:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install Kubectl and Eksctl
+          command: |
+            chmod u+x install-dep.sh \
+            ./install-dep.sh
+      - run:
+          name: Creating K8S cluster
+          command: |
+            echo
+            chmod u+x k8-cluster.sh \
+            ./k8-cluster.sh
+      - run:
+          name: Deploying application
+          command: |
+              kubectl apply -f *.yml
+      - run:
+          name: Delete Cluster
+          command: |
+            chmod u+x del-cluster.sh \
+            ./del-cluster.sh
+          when: on_fail
 
 workflows:
   deploy-infra:
@@ -88,9 +114,12 @@ workflows:
     - backend_test
     - lint-frontend-dockerfile
     - lint-backend-dockerfile
-    - docker-compose-up:
+    - docker-compose:
         requires:
         - lint-frontend-dockerfile
         - lint-backend-dockerfile
         - frontend_test
         - backend_test
+    - create-cluster:
+        requires:
+        - docker-compose

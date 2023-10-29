@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: prod-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hostober
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: hostober
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: sageiyke/flaskapp:v1
+          ports:
+          - containerPort: 5000
