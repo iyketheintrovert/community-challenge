@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Create EKS Cluster
+echo
 eksctl create cluster \
     --name devops-project \
     --region us-east-1 \

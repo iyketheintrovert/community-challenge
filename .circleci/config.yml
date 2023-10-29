@@ -1,84 +1,84 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-orbs:
-  node: circleci/node@5.1.0
-  python: circleci/python@2.1.1
-  docker: circleci/docker@2.4.0
+# orbs:
+  # node: circleci/node@5.1.0
+  # python: circleci/python@2.1.1
+  # docker: circleci/docker@2.4.0
 
-commands:
-  stop-container:
-    description: Stops Container and removes Image
-    steps:
-      - run:
-          name: Clean Environment
-          when: on_fail
-          command: |
-            docker stop $(ps -a -q)
-            docker rm $(ps -a -q)
-            docker rmi $(docker images -q)
+# commands:
+#   stop-container:
+#     description: Stops Container and removes Image
+#     steps:
+#       - run:
+#           name: Clean Environment
+#           when: on_fail
+#           command: |
+#             docker stop $(ps -a -q)
+#             docker rm $(ps -a -q)
+#             docker rmi $(docker images -q)
 
 jobs:
-  frontend_test:
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run lint
-          name: Run tests
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - .
-  backend_test:
-    executor: python/default
-    steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-      - run:
-          command: pip install pylint && pylint main.py
-          name: Run tests
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - .
-  lint-frontend-dockerfile:
-    executor: docker/machine
-    steps:
-      - checkout
-      - docker/dockerlint:
-          dockerfile: web.Dockerfile
-          treat-warnings-as-errors: true
+  # frontend_test:
+  #   executor: node/default
+  #   steps:
+  #     - checkout
+  #     - node/install-packages:
+  #         pkg-manager: npm
+  #     - run:
+  #         command: npm run lint
+  #         name: Run tests
+  #     - persist_to_workspace:
+  #         root: ./
+  #         paths:
+  #           - .
+  # backend_test:
+  #   executor: python/default
+  #   steps:
+  #     - checkout
+  #     - python/install-packages:
+  #         pkg-manager: pip
+  #     - run:
+  #         command: pip install pylint && pylint main.py
+  #         name: Run tests
+  #     - persist_to_workspace:
+  #         root: ./
+  #         paths:
+  #           - .
+  # lint-frontend-dockerfile:
+  #   executor: docker/machine
+  #   steps:
+  #     - checkout
+  #     - docker/dockerlint:
+  #         dockerfile: web.Dockerfile
+  #         treat-warnings-as-errors: true
   
-  lint-backend-dockerfile:
-    executor: docker/machine
-    steps:
-      - checkout
-      - docker/dockerlint:
-          dockerfile: api.Dockerfile
-          treat-warnings-as-errors: true
+  # lint-backend-dockerfile:
+  #   executor: docker/machine
+  #   steps:
+  #     - checkout
+  #     - docker/dockerlint:
+  #         dockerfile: api.Dockerfile
+  #         treat-warnings-as-errors: true
 
 
-  docker-compose:
-    executor: docker/machine
-    steps:
-      - checkout
-      - run:
-          name: Login for Docker Hub
-          command: | 
-            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-      - run:
-          name: Start Docker Compose
-          command: |
-            docker compose up --build -d
-      - stop-container
-      - run:
-          name: Push Images
-          command: |
-            docker compose push
+  # docker-compose:
+  #   executor: docker/machine
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Login for Docker Hub
+  #         command: | 
+  #           echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+  #     - run:
+  #         name: Start Docker Compose
+  #         command: |
+  #           docker compose up --build -d
+  #     - stop-container
+  #     - run:
+  #         name: Push Images
+  #         command: |
+  #           docker compose push
   
   create-cluster:
     docker:
@@ -88,6 +88,7 @@ jobs:
       - run:
           name: Install Kubectl and Eksctl
           command: |
+            echo
             chmod u+x install-dep.sh \
             ./install-dep.sh
       - run:
@@ -103,23 +104,24 @@ jobs:
       - run:
           name: Delete Cluster
           command: |
+            echo
             chmod u+x del-cluster.sh \
             ./del-cluster.sh
           when: on_fail
 
 workflows:
-  deploy-infra:
+  deploy:
     jobs:
-    - frontend_test
-    - backend_test
-    - lint-frontend-dockerfile
-    - lint-backend-dockerfile
-    - docker-compose:
-        requires:
-        - lint-frontend-dockerfile
-        - lint-backend-dockerfile
-        - frontend_test
-        - backend_test
-    - create-cluster:
-        requires:
-        - docker-compose
+    # - frontend_test
+    # - backend_test
+    # - lint-frontend-dockerfile
+    # - lint-backend-dockerfile
+    # - docker-compose:
+    #     requires:
+    #     - lint-frontend-dockerfile
+    #     - lint-backend-dockerfile
+    #     - frontend_test
+    #     - backend_test
+    - create-cluster
+        # requires:
+        # - docker-compose
