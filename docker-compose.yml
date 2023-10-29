@@ -10,7 +10,7 @@ services:
     ports:
       - "80:80"
     env_file:
-      - .env
+      - .env.vault
     # command: npm run serve
 
   backend:
@@ -26,5 +26,5 @@ services:
       - FLASK_APP=main.py
       - FLASK_ENV=development
     env_file:
-      - .env
+      - .env.vault
     # command: flask run --host=0.0.0.0
