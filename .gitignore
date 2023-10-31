@@ -7,3 +7,9 @@ __pycache__
 .flaskenv*
 !.env.project
 !.env.vault
+
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
