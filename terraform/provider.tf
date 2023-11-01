@@ -1,9 +1,9 @@
 terraform {
   cloud {
-    organization = var.TFOrganization
+    organization = "sageiyke"
 
     workspaces {
-      name = var.workspace
+      name = "hostober-project"
     }
   }
   required_providers {

@@ -25,9 +25,9 @@ jobs:
     steps:
       - checkout
       - terraform/init:
-          path: .
+          path: terraform/
       - terraform/validate:
-          path: .
+          path: terraform/
   # plan-apply:
   #   working_directory: ../terraform
   #   docker:

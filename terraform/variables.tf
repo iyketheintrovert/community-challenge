@@ -32,13 +32,3 @@ variable "nodeGroups" {
   type = map(any)
   description = "name of the node groups created"
 }
-
-variable "TFOrganization" {
-  type = string
-  description = "name of the terraform cloud organization"
-}
-
-variable "workspace" {
-  type = string
-  description = "name of the terraform cloud workspace"
-}
