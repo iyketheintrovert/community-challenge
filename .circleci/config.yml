@@ -7,7 +7,15 @@ orbs:
 #   python: circleci/python@2.1.1
 #   docker: circleci/docker@2.4.0
 
-# commands:
+commands:
+  terraform-setup:
+    description: Configures terraform cloud credentials
+    steps:
+      - run:
+          command: >-
+            echo "credentials \"app.terraform.io\" {token =
+            \"$TF_TOKEN_app_terraform_io\"}" > $HOME/.terraformrc
+          name: Create .terraformrc file locally
   # stop-container:
   #   description: Stops Container and removes Image
   #   steps:
@@ -20,10 +28,11 @@ orbs:
   #           docker rmi $(docker images -q)
 
 jobs:
-  plan-apply:
+  init-plan:
     executor: terraform/default
     steps:
       - checkout
+      - terraform-setup
       - terraform/init:
           path: terraform
       - terraform/plan:
@@ -206,7 +215,7 @@ workflows:
       #     requires:
       #       - terraform/apply
       #     type: approval
-    - plan-apply
+    - init-plan
     # - hold-apply:
     #     type: approval
     #     requires:
