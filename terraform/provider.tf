@@ -1,11 +1,5 @@
 terraform {
-  cloud {
-    organization = "sageiyke"
-
-    workspaces {
-      name = "hostober-project"
-    }
-  }
+  cloud {}
   required_providers {
     aws = {
       source  = "hashicorp/aws"

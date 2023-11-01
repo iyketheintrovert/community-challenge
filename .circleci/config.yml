@@ -1,8 +1,8 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-orbs:
-  terraform: circleci/terraform@3.2.1
+# orbs:
+#   terraform: circleci/terraform@3.2.1
 #   node: circleci/node@5.1.0
 #   python: circleci/python@2.1.1
 #   docker: circleci/docker@2.4.0
@@ -20,29 +20,21 @@ orbs:
   #           docker rmi $(docker images -q)
 
 jobs:
-  init:
-    executor: terraform/default
+  plan-apply:
+    working_directory: terraform/
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - checkout
-      - terraform/init:
-          path: terraform/
-      - terraform/validate:
-          path: terraform/
-  # plan-apply:
-  #   working_directory: ../terraform
-  #   docker:
-  #     - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: terraform init & plan
-  #         command: |
-  #           terraform init -input=false
-  #           terraform plan -out tfapply ./
-  #     - persist_to_workspace:
-  #         root: .
-  #         paths:
-  #           - .
+      - run:
+          name: terraform init & plan
+          command: |
+            terraform init -input=false
+            terraform plan -out tfapply ./
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   # apply:
   #   docker:
@@ -187,7 +179,6 @@ jobs:
 workflows:
   deploy:
     jobs:
-      - init
       # - terraform/init:
       #     checkout: true
       #     context: terraform
@@ -221,7 +212,7 @@ workflows:
       #     requires:
       #       - terraform/apply
       #     type: approval
-    # - plan-apply
+    - plan-apply
     # - hold-apply:
     #     type: approval
     #     requires:
