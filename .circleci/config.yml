@@ -1,8 +1,8 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# orbs:
-#   terraform: circleci/terraform@3.2.1
+orbs:
+  terraform: circleci/terraform@3.2.1
 #   node: circleci/node@5.1.0
 #   python: circleci/python@2.1.1
 #   docker: circleci/docker@2.4.0
@@ -21,20 +21,14 @@ version: 2.1
 
 jobs:
   plan-apply:
-    working_directory: terraform/
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    executor: terraform/default
     steps:
       - checkout
-      - run:
-          name: terraform init & plan
-          command: |
-            terraform init -input=false
-            terraform plan -out tfapply ./
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - terraform/init:
+          path: terraform
+      - terraform/plan:
+          path: terraform
+          out: tfapply
 
   # apply:
   #   docker:
