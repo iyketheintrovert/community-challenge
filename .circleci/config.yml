@@ -1,7 +1,8 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# orbs:
+orbs:
+  terraform: circleci/terraform@3.2.1
 #   node: circleci/node@5.1.0
 #   python: circleci/python@2.1.1
 #   docker: circleci/docker@2.4.0
@@ -18,67 +19,67 @@ version: 2.1
   #           docker rm $(ps -a -q)
   #           docker rmi $(docker images -q)
 
-jobs:
-  plan-apply:
-    working_directory: ../terraform
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - checkout
-      - run:
-          name: terraform init & plan
-          command: |
-            terraform init -input=false
-            terraform plan -out tfapply ./
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+# jobs:
+  # plan-apply:
+  #   working_directory: ../terraform
+  #   docker:
+  #     - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: terraform init & plan
+  #         command: |
+  #           terraform init -input=false
+  #           terraform plan -out tfapply ./
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #           - .
 
-  apply:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-           name: terraform apply
-           command: |
-            terraform apply -auto-approve tfapply
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+  # apply:
+  #   docker:
+  #     - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #          name: terraform apply
+  #          command: |
+  #           terraform apply -auto-approve tfapply
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #           - .
 
-  plan-destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform create destroy plan
-          command: |
-            terraform plan -destroy -out tfdestroy ./
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+  # plan-destroy:
+  #   docker:
+  #     - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #         name: terraform create destroy plan
+  #         command: |
+  #           terraform plan -destroy -out tfdestroy ./
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #           - .
 
-  destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-           name: terraform destroy
-           command: |
-            terraform destroyy -auto-approve tfdestroy
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+  # destroy:
+  #   docker:
+  #     - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #          name: terraform destroy
+  #          command: |
+  #           terraform destroyy -auto-approve tfdestroy
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #           - .
   # frontend_test:
   #   executor: node/default
   #   steps:
@@ -178,24 +179,48 @@ jobs:
 workflows:
   deploy:
     jobs:
-    - plan-apply
-    - hold-apply:
-        type: approval
-        requires:
-          - plan-apply
-    - apply:
-        requires:
-        - hold-apply
-    - plan-destroy:
-        requires:
-          - apply
-    - hold-destroy:
-        type: approval
-        requires:
-          - plan-destroy
-    - destroy:
-        requires:
-        - hold-destroy
+      - terraform/fmt:
+          checkout: true
+          context: terraform
+      - terraform/validate:
+          checkout: true
+          context: terraform
+          requires:
+            - terraform/fmt
+      - terraform/plan:
+          checkout: true
+          context: terraform
+          requires:
+            - terraform/validate
+      - terraform/apply:
+          attach-workspace: true
+          context: terraform
+          requires:
+            - terraform/plan
+      - terraform/destroy:
+          attach-workspace: true
+          context: terraform
+          requires:
+            - terraform/apply
+          type: approval
+    # - plan-apply
+    # - hold-apply:
+    #     type: approval
+    #     requires:
+    #       - plan-apply
+    # - apply:
+    #     requires:
+    #     - hold-apply
+    # - plan-destroy:
+    #     requires:
+    #       - apply
+    # - hold-destroy:
+    #     type: approval
+    #     requires:
+    #       - plan-destroy
+    # - destroy:
+    #     requires:
+    #     - hold-destroy
     # - frontend_test
     # - backend_test
     # - lint-frontend-dockerfile
