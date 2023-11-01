@@ -179,27 +179,36 @@ orbs:
 workflows:
   deploy:
     jobs:
+      - terraform/init:
+          checkout: true
+          context: terraform
+          path: /terraform
       - terraform/fmt:
           checkout: true
           context: terraform
+          path: /terraform
       - terraform/validate:
           checkout: true
           context: terraform
+          path: /terraform
           requires:
             - terraform/fmt
       - terraform/plan:
           checkout: true
           context: terraform
+          path: /terraform
           requires:
             - terraform/validate
       - terraform/apply:
           attach-workspace: true
           context: terraform
+          path: /terraform
           requires:
             - terraform/plan
       - terraform/destroy:
           attach-workspace: true
           context: terraform
+          path: /terraform
           requires:
             - terraform/apply
           type: approval
