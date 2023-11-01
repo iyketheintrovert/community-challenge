@@ -1,4 +1,11 @@
 terraform {
+  cloud {
+    organization = var.TFOrganization
+
+    workspaces {
+      name = var.workspace
+    }
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
