@@ -20,7 +20,7 @@ version: 2.1
 
 jobs:
   plan-apply:
-    working_directory: ~/project
+    working_directory: ~/terraform
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
