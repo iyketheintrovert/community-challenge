@@ -15,7 +15,14 @@ terraform {
       version = "~> 2.3.2"
     }
   }
-  backend "remote" {}
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "sageiyke"
+
+    workspaces {
+      name = "hostober-project"
+    }
+  }
 }
 
 provider "aws" {

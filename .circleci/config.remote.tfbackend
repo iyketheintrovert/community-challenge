@@ -1,0 +1,4 @@
+# config.remote.tfbackend
+workspaces { name = "hostober-project" }
+hostname     = "app.terraform.io"
+organization = "sageiyke"
