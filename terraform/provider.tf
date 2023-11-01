@@ -1,5 +1,4 @@
 terraform {
-  cloud {}
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -16,6 +15,7 @@ terraform {
       version = "~> 2.3.2"
     }
   }
+  backend "remote" {}
 }
 
 provider "aws" {
